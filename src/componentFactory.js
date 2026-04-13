@@ -69,11 +69,18 @@ export default function(pdfjsWrapper) {
 
 				// on IE10- canvas height must be set
 				this.$refs.canvas.style.height = this.$refs.canvas.offsetWidth * (this.$refs.canvas.height / this.$refs.canvas.width) + 'px';
-				// update the page when the resolution is too poor
-				var resolutionScale = this.pdf.getResolutionScale();
 
-				if ( resolutionScale < 0.85 || resolutionScale > 1.15 )
-					this.pdf.renderPage(this.rotate);
+				// debounce renderPage to avoid rapid cancel/re-render cycles on Windows
+				if ( this._resizeTimer )
+					clearTimeout(this._resizeTimer);
+
+				this._resizeTimer = setTimeout(function() {
+					// update the page when the resolution is too poor
+					var resolutionScale = this.pdf.getResolutionScale();
+
+					if ( resolutionScale < 0.85 || resolutionScale > 1.15 )
+						this.pdf.renderPage(this.rotate);
+				}.bind(this), 150);
 
 				// this.$refs.annotationLayer.style.transform = 'scale('+resolutionScale+')';
 			},
