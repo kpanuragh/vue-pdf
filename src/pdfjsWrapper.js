@@ -259,7 +259,7 @@ export default function(PDFJS) {
 				.catch(function(err) {
 
 					pdfRender = null;
-					if ( err instanceof PDFJS.RenderingCancelledException ) {
+					if ( err instanceof PDFJS.RenderingCancelledException || (err && err.name === 'RenderingCancelledException') ) {
 
 						canceling = false;
 						this.renderPage(rotate);
